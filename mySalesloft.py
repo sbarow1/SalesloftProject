@@ -5,18 +5,19 @@ Created on May 16, 2016
 '''
 import time
 from selenium import webdriver
-from myHoovers import MyHoovers
+import myHoovers
 from selenium.common.exceptions import WebDriverException
-from mySiteObject import MySiteObject
+import mySiteObject
+import pyperclip
 
-class MySalesloft(MySiteObject):
+class MySalesloft(mySiteObject.MySiteObject):
 
     def __init__(self, tokenfile):
         '''
         Constructor
         '''
         #username, password = tokens
-        MySiteObject.__init__(self, tokenfile)
+        mySiteObject.MySiteObject.__init__(self, tokenfile)
 
         # Now open Salesloft
         self.browser = webdriver.Chrome('/users/seanbarow/pySean/chromedriver')
@@ -31,8 +32,11 @@ class MySalesloft(MySiteObject):
         time.sleep(5)
         
     def updateName(self, name, email):
+        # TODO: Needs to put this in Pyperclip
         print(name)
         print(email)
+        # Put the name in the clipboard
+        pyperclip.copy(name)
         input('Click the correct person')
         time.sleep(5)
         # Click the edit button
@@ -50,7 +54,7 @@ class MySalesloft(MySiteObject):
         emailText.clear()
     
         # Open a Hoover's instance to find the correct email address
-        handlerH = MyHoovers()
+        handlerH = myHoovers.MyHoovers()
     # Search Hoovers
         handlerH.hooverSearch(name)
         input('Are you done?')
@@ -64,10 +68,16 @@ class MySalesloft(MySiteObject):
         items = html_list.find_elements_by_tag_name("li")
         for item in items:
             if item.text == 'Cadences':
-                item.click()
+                try:
+                    item.click()
+                except WebDriverException:
+                    input('Is there anything in the way?')
+                    item.click()
         viewInCRM = self.browser.find_element_by_css_selector('a.dropdown-toggle.ng-scope')
         viewInCRM.click()
         print('{}'.format(email))
+        # Put the email in the clipboard
+        pyperclip.copy(email)
         input('Set the email address and the cadence')
         
     def getBouncingEmails(self):
